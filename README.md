@@ -22,12 +22,12 @@ includes three aspects which might be useful in other contexts.
 This project is concerned with the modeling and simulation of robotic acutators
 (Simulink/Matlab) with various methods of control. The acutators currently
 include a simple DC motor/servo, but stepper motors and hydraulics will be
-considered as soon as time allows. All controllers will be implemented in
-discrete/continuous time in Simulink, but also in *Python* (using ROS Indigo
-in conjunction with a Beaglebone Black) and in *C* (using an AVR Omega). Taking
+considered as soon as possible. All controllers will be implemented in
+discrete/continuous time in Simulink, but also in Python (using ROS Indigo
+in conjunction with a Beaglebone Black) and in C (using an AVR Omega). Taking
 this modular approach hope is to provide advanced methods of control for as many
-acutators as possible, which can be compared in simulation before using an already
-written controller in the desired language.
+acutators as possible, which can be simulated qualitatively before using an already
+written controller in the desired programming language.
 
 #### /estimation_project
 Yet to be written.
