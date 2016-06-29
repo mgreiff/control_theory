@@ -1,5 +1,5 @@
 close all;
-
+clear all;
 %% Top level settings
 % Here a model which is to be simulated is set (h) with a controller (c)
 % which is then simulated in a specified time (t). To change model or 
@@ -8,7 +8,7 @@ close all;
 % simulink models themselves. The default setting simulates a DC motor with
 % a conditional anti-windup scheme in continuous time.
 h = 'DC_motor';
-c = 'PIDAW';
+c = 'PID';
 t = 'continuous';
 
 %% Check that the input data is valid
@@ -21,8 +21,10 @@ end
 
 if ~strcmp('response', c) &&...
    ~strcmp('PID', c) &&...
-   ~strcmp('PIDAW', c) &&...
+   ~strcmp('PID_AW', c) &&...
    ~strcmp('cascade', c) &&...
+   ~strcmp('LQR_precomp', c) && ...
+   ~strcmp('LQR_integrator', c)
     disp(['The controller ', c, ' does not exist in the library.'])
     disp('Valid choices are: response, PID, PIDAW and cascade.')
     return
@@ -53,5 +55,6 @@ else
     fprintf(['\nSimulating a ', h, ' with ', c, ' controller in ', t, ' time... '])
 end
 open([h, '_', c]);
+ArtificialAlgebraicLoopMsg = 'none';
 sim([h, '_', c]);
 fprintf('Done!\n')

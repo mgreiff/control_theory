@@ -1,0 +1,110 @@
+\documentclass{article}
+
+\usepackage{stmaryrd}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{relsize} 
+\usepackage{bm} 
+\usepackage{IEEEtrantools}
+\usepackage{graphicx}
+\usepackage[font={small,it}, width=\textwidth]{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{cases}
+\usepackage{xfrac}
+\usepackage{comment}
+\usepackage{framed}
+\usepackage[ ddmmyyyy ]{datetime} 
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\usepackage{cite}
+\usepackage{float}
+\usepackage{multirow}
+
+\newcommand{\source}[1]{\caption*{\hfill Source: {#1}} }
+
+\usepackage{mathtools}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\sat}{sat}
+
+\oddsidemargin = 20pt
+\textwidth = 420pt
+
+\hypersetup{
+     colorlinks   = true,
+     linkcolor    = blue
+}
+
+\title{The Beagle Project}
+\author{Marcus Greiff}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This project is still in it's early stages, and the following document simply defines the equations of the DC motor model which is used to simulate the currently implemented regulators. A more detailed derivation and definitions will be added as soon as possible.
+\section{Motor model}
+\subsubsection*{Governing equations}
+Assuming a simple DC motor model with constant magnetic field, Newton's and Kirchoff's laws can be used to derive the governing equations 
+\begin{flalign}
+\frac{d^2\theta(t)}{dt^2} &= \frac{1}{J}\Big(K_t i(t) - b\frac{d\theta (t)}{d t}\Big)\\
+\frac{di(t)}{dt} &= \frac{1}{L}\Big(-Ri(t) + V(t) - K_e\frac{d\theta(t)}{dt}\Big)
+\end{flalign}
+\subsubsection*{Statespace form}
+\begin{flalign}
+\dot{\mathbf{x}}(t) &= \mathbf{A}\mathbf{x}(t) + \mathbf{B}\mathbf{u}(t)\\
+\mathbf{y}(t) &= \mathbf{C}\mathbf{x}(t)
+\end{flalign}
+Let
+\begin{equation}
+\mathbf{x}(t) = \begin{bmatrix}\theta(t) & \dot{\theta}(t) & i(t) \end{bmatrix}^T, \qquad \mathbf{u}(t) = V(t)
+\end{equation}
+then
+\begin{equation}
+\mathbf{A} =\begin{bmatrix} 0 & 1 & 0 \\ 0 & -b/J & K_t/J  \\ 0 & -K_e/L & -R/L  \end{bmatrix}, \quad
+\mathbf{B} =\begin{bmatrix} 0  \\ 0  \\ 1/L  \end{bmatrix}, \quad
+\mathbf{C} = \mathbb{I}_{3\times 3}
+\end{equation}
+\subsubsection*{Laplace domain equivalent}
+Let
+\begin{equation}
+\mathcal{L}\begin{Bmatrix}\Theta(t)\end{Bmatrix}_s=\Theta(s), \quad\mathcal{L}\begin{Bmatrix}i(t)\end{Bmatrix}_s=I(s), \quad\mathcal{L}\begin{Bmatrix}V(t)\end{Bmatrix}_s=V(s), \quad
+\end{equation}
+then
+\begin{flalign}
+s^2\Theta(s) &= \frac{1}{J}\Big(K_t I(s) - b s\Theta(s)\Big)\\
+sI(s) &= \frac{1}{L}\Big(-R I(s) + V(s) - K_e s\Theta(s)\Big)
+\end{flalign}
+\subsubsection*{transfer function from $V(s)$ to $\Theta(s)$}
+\begin{flalign}
+G(s)_{U\rightarrow\Theta} &= \frac{\Theta(s)}{U(s)} =  \frac{K_t}{s((sL+R)(J s +b) +K_tK_e)}U(s)
+\end{flalign}
+Using a partial fraction decomposition, this may be written
+\begin{flalign}
+G(s)_{U\rightarrow\Theta} = \frac{A}{s} - \frac{B + Cs}{s^2 + D s + E} = \frac{A}{s} + \frac{B}{s^2 + D s + E}+\frac{Cs}{s^2 + D s + E}
+\end{flalign}
+\begin{flalign}
+\frac{Kt}{(s*(R*b + Ke*Kt))} - \frac{(J*Kt*R + Kt*L*b)/(R*b + Ke*Kt) + (J*Kt*L*s)/(R*b + Ke*Kt)}{J*L*s^2 + (L*b + J*R)*s + R*b + Ke*Kt}
+\end{flalign}
+\subsubsection*{transfer function from $V(s)$ to $I(s)$}
+
+\subsubsection*{LS-estimation}
+Using a Bilinear z-transform, it is evident that
+\begin{flalign}
+\mathcal{Z}\begin{Bmatrix}G(s)\end{Bmatrix}_z = \frac{a_2z^2 + a_1z^1 + a_0}{z^3 + b_2z^2 + b_1z^1 + b_0}
+\end{flalign}
+Letting
+\begin{equation}
+\begin{cases}
+\theta =  \begin{bmatrix}a_2 & a_1 & a_0 & b_2 & b_1 & b_0 \end{bmatrix}^T\\
+\varphi(t-1) = \begin{bmatrix}u(t-1)& u(t-2) & u(t-3) & -y(t-1)& -y(t-2) & -y(t-3) \end{bmatrix}^T
+\end{cases}
+\end{equation}
+we note that the discrete time difference equation can be written
+\begin{equation}
+y(t) = \varphi(t-1)^T\theta
+\end{equation}
+\newpage\bibliography{Bibliography}{}
+\bibliographystyle{IEEEtran}
+\end{document}
