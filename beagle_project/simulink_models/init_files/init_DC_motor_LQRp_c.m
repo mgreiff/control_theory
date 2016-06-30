@@ -18,7 +18,7 @@ R = eye(size(B, 2));  % dim(R) = (n. of c. signals, n. of c. signals)
 %% Compute precompensation gain
 s = size(A,1);
 Z = [zeros([1,s]) 1];
-C = [1,0,0];              % reference given with respect to theta
+Chat = [1,0,0];              % reference given with respect to theta
 D = [0];
-N = inv([A,B;C,D])*Z';
+N = inv([A,B;Chat,0])*Z';
 LQR_N = N(1+s) + LQR_K * N(1:s);

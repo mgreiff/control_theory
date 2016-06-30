@@ -105,6 +105,22 @@ we note that the discrete time difference equation can be written
 \begin{equation}
 y(t) = \varphi(t-1)^T\theta
 \end{equation}
+
+\subsection{Controllers}
+\begin{flalign}
+\dot {x}_1 &= x_2\\
+\dot {x}_2 &= (-bx_2 + K_tx_3)/J  \\
+\dot {x}_3 &= (-K_ex_2 -Rx_3+ u)/L
+\end{flalign}
+with
+\begin{equation}
+V(x_1, x_2, x_3) = \frac{1}{2}(x_1^2 + x_2^2 + x_3^2)
+\end{equation}
+\begin{flalign}
+\frac{\partial V(x_1, x_2, x_3)}{\partial t} &= {x}_1\dot{x}_1 + {x}_2\dot{x}_2 + {x}_3\dot{x}_3\\
+&= {x}_1x_2 + {x}_2(-bx_2 + K_tx_3)/J+ {x}_3(-K_ex_2 -Rx_3+ u)/L\\
+&= {x}_1x_2 -bx_2^2/J + (K_t/J -K_e/L)x_2{x}_3 -Rx_3^2/L+ u/L
+\end{flalign}
 \newpage\bibliography{Bibliography}{}
 \bibliographystyle{IEEEtran}
 \end{document}

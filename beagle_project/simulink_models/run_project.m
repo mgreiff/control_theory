@@ -1,38 +1,53 @@
-close all;
-clear all;
 %% Top level settings
-% Here a model which is to be simulated is set (h) with a controller (c)
+% Here, the model which is to be simulated is set (h) with a controller (c)
 % which is then simulated in a specified time (t). To change model or 
-% controller parameters, change the corresponding init file or the
-% appropriate parameter in the workspace. No parameters are set in the
-% simulink models themselves. The default setting simulates a DC motor with
-% a conditional anti-windup scheme in continuous time.
-h = 'DC_motor';
-c = 'PID';
-t = 'continuous';
+% controller parameters, alter the corresponding init file or the
+% appropriate parameter in the workspace. No parameters are hard coded in
+% the simulink models themselves. The default setting simulates a DC motor
+% with a conditional anti-windup scheme in continuous time.
+%
+% Valid options are:
+%
+% h:
+%      'DC_motor'   - Simulates the DC motor model.
+% c:
+%      'PID'        - Regular PID controller
+%      'PIDAW'      - PID controller with conditional anti-windup (AW)
+%      'PIDcascade  - Cascade control loop for position control with AW
+%      'LQRi'       - LQR with inegrator states for elimination of ss error
+%      'LQRp'       - Precompensated LQR for good trajectory following
+% t:
+%     'continuous'  - Simulates model and controller in continuous time
+%     'discrete'    - Simulates model and discrete in continuous time
+
+close all;
+clear;
+
+opt.h = 'DC_motor';
+opt.c = 'LQRp';
+opt.t = 'continuous';
 
 %% Check that the input data is valid
-if ~strcmp('DC_motor', h) &&...
-   ~strcmp('stepper_motor', h)
-    disp(['The hardware ', h, ' does not exist in the library.'])
+if ~strcmp('DC_motor', opt.h)
+    disp(['The hardware model "', opt.h, '" does not exist in the library.'])
     disp('Valid choices are: DC_motor and stepper_motor.')
     return
 end
 
-if ~strcmp('response', c) &&...
-   ~strcmp('PID', c) &&...
-   ~strcmp('PID_AW', c) &&...
-   ~strcmp('cascade', c) &&...
-   ~strcmp('LQR_precomp', c) && ...
-   ~strcmp('LQR_integrator', c)
-    disp(['The controller ', c, ' does not exist in the library.'])
+if ~strcmp('response', opt.c) &&...
+   ~strcmp('PID', opt.c) &&...
+   ~strcmp('PIDAW', opt.c) &&...
+   ~strcmp('PIDcascade', opt.c) &&...
+   ~strcmp('LQRp', opt.c) && ...
+   ~strcmp('LQRi', opt.c)
+    disp(['The controller ', opt.c, ' does not exist in the library.'])
     disp('Valid choices are: response, PID, PIDAW and cascade.')
     return
 end
 
-if ~strcmp('continuous', t) &&...
-   ~strcmp('discrete', t)
-    disp(['The spcified time ', t, ' does not exist in the library.'])
+if ~strcmp('continuous', opt.t) &&...
+   ~strcmp('discrete', opt.t)
+    disp(['The spcified time ', opt.t, ' does not exist in the library.'])
     disp('Valid choices are: continuous and discrete.')
     return
 end
@@ -42,19 +57,18 @@ addpath(genpath('.'));
 
 %% Run init files
 fprintf('Initializing... ')
-run(['init_', h, '.m'])
-if ~strcmp('response', c)
-    run(['init_', h, '_', c, '.m'])
+run(['init_', opt.h, '.m'])
+if ~strcmp('response', opt.c)
+    run(['init_', opt.h, '_', opt.c, '_', opt.t(1), '.m'])
 end
 fprintf('Done!')
 
 %% Open and simulate model
-if strcmp('response', c)
-    fprintf(['\nSimulating a ', h, ' ', c, ' in ', t, ' time... '])
+if strcmp('response', opt.c)
+    fprintf(['\nSimulating a ', opt.h, ' ', opt.c, ' in ', opt.t, ' time... '])
 else
-    fprintf(['\nSimulating a ', h, ' with ', c, ' controller in ', t, ' time... '])
+    fprintf(['\nSimulating a ', opt.h, ' with ', opt.c, ' in ', opt.t, ' time... '])
 end
-open([h, '_', c]);
-ArtificialAlgebraicLoopMsg = 'none';
-sim([h, '_', c]);
+open([opt.h, '_', opt.c, '_', opt.t(1)]);
+sim([opt.h, '_', opt.c, '_', opt.t(1)]);
 fprintf('Done!\n')
