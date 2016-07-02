@@ -23,11 +23,13 @@ This project is concerned with the modeling and simulation of robotic acutators
 (Simulink/Matlab) with various methods of control. The acutators currently
 include a simple DC motor/servo, but stepper motors and hydraulics will be
 considered as soon as possible. All controllers will be implemented in
-discrete/continuous time in Simulink, but also in Python (using ROS Indigo
-in conjunction with a Beaglebone Black) and in C (using an AVR Omega). Taking
-this modular approach hope is to provide advanced methods of control for as many
-acutators as possible, which can be simulated qualitatively before using an already
-written controller in the desired programming language.
+discrete/continuous time in Simulink, where they can be analyzed in depth.
+However, independently of Matlab/simulink, there will exist options of (i)
+generating hard coded controllers in C and Python, (ii) methods of simulating
+the generated controllers in Python, (iii) methods of automatic system 
+identification and finally (iv) physical examples of acutator control in Python
+(using ROS Indigo in conjunction with a Beaglebone Black) and in C (using an
+AVR Omega) with the generated controllers.
 
 #### /estimation_project
 Yet to be written.

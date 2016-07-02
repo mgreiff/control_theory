@@ -11,11 +11,14 @@
 % h:
 %      'DC_motor'   - Simulates the DC motor model.
 % c:
+%      'feedback'   - Linear feedback law with pp -1+-i (c) or 0 (d)
 %      'PID'        - Regular PID controller
 %      'PIDAW'      - PID controller with conditional anti-windup (AW)
 %      'PIDcascade  - Cascade control loop for position control with AW
 %      'LQRi'       - LQR with inegrator states for elimination of ss error
 %      'LQRp'       - Precompensated LQR for good trajectory following
+%      'MRAC'       - Adaptive control with reference model poles in -1+-i
+%      'SMC'        - Sliding mode control with respect to angular position
 % t:
 %     'continuous'  - Simulates model and controller in continuous time
 %     'discrete'    - Simulates model and discrete in continuous time
@@ -24,12 +27,13 @@ close all;
 clear;
 
 opt.h = 'DC_motor';
-opt.c = 'LQRp';
+opt.c = 'SMC';
 opt.t = 'continuous';
 
 %% Check that the input data is valid
 if ~strcmp('DC_motor', opt.h)
-    disp(['The hardware model "', opt.h, '" does not exist in the library.'])
+    disp(['The hardware model "', opt.h,...
+          '" does not exist in the library.'])
     disp('Valid choices are: DC_motor and stepper_motor.')
     return
 end
@@ -39,7 +43,9 @@ if ~strcmp('response', opt.c) &&...
    ~strcmp('PIDAW', opt.c) &&...
    ~strcmp('PIDcascade', opt.c) &&...
    ~strcmp('LQRp', opt.c) && ...
-   ~strcmp('LQRi', opt.c)
+   ~strcmp('LQRi', opt.c) && ...
+   ~strcmp('MRAC', opt.c) && ...
+   ~strcmp('SMC', opt.c)
     disp(['The controller ', opt.c, ' does not exist in the library.'])
     disp('Valid choices are: response, PID, PIDAW and cascade.')
     return
@@ -57,18 +63,31 @@ addpath(genpath('.'));
 
 %% Run init files
 fprintf('Initializing... ')
-run(['init_', opt.h, '.m'])
-if ~strcmp('response', opt.c)
-    run(['init_', opt.h, '_', opt.c, '_', opt.t(1), '.m'])
+try
+    run(['init_', opt.h, '.m'])
+    if ~strcmp('response', opt.c)
+        run(['init_', opt.h, '_', opt.c, '_', opt.t(1), '.m'])
+    end
+    fprintf('Done!')
+catch
+     fprintf(['Failed!\nThe initialization file "init_', opt.h, '_',...
+              opt.c, '_', opt.t(1), '.m" could not be found.\n'])
 end
-fprintf('Done!')
 
 %% Open and simulate model
 if strcmp('response', opt.c)
-    fprintf(['\nSimulating a ', opt.h, ' ', opt.c, ' in ', opt.t, ' time... '])
+    fprintf(['\nSimulating a ', opt.h, ' ', opt.c, ' in ',...
+             opt.t, ' time... '])
 else
-    fprintf(['\nSimulating a ', opt.h, ' with ', opt.c, ' in ', opt.t, ' time... '])
+    fprintf(['\nSimulating a ', opt.h, ' with ', opt.c, ' in ',...
+             opt.t, ' time... '])
 end
-open([opt.h, '_', opt.c, '_', opt.t(1)]);
-sim([opt.h, '_', opt.c, '_', opt.t(1)]);
-fprintf('Done!\n')
+
+try
+    open([opt.h, '_', opt.c, '_', opt.t(1)]);
+    sim([opt.h, '_', opt.c, '_', opt.t(1)]);
+    fprintf('Done!\n')
+catch
+    fprintf(['Failed!\nThe controller may not be supported in ',...
+             opt.t, ' time just yet.\n'])
+end
