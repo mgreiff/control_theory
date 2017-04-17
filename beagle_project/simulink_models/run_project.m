@@ -9,51 +9,61 @@
 % Valid options are:
 %
 % h:
-%      'DC_motor'   - Simulates the DC motor model.
+%     'DC_motor'   - Simulates the DC motor model.
 % c:
-%      'feedback'   - Linear feedback law with pp -1+-i (c) or 0 (d)
-%      'PID'        - Regular PID controller
-%      'PIDAW'      - PID controller with conditional anti-windup (AW)
-%      'PIDcascade  - Cascade control loop for position control with AW
-%      'LQRi'       - LQR with inegrator states for elimination of ss error
-%      'LQRp'       - Precompensated LQR for good trajectory following
-%      'MRAC'       - Adaptive control with reference model poles in -1+-i
-%      'SMC'        - Sliding mode control with respect to angular position
+%     'feedback'   - Linear feedback law with pp -1+-i (c) or 0 (d)
+%     'PID'        - Regular PID controller
+%     'PIDAW'      - PID controller with conditional anti-windup (AW)
+%     'PIDcascade' - Cascade control loop for position control with AW
+%     'LQRi'       - LQR with inegrator states for elimination of ss error
+%     'LQRp'       - Precompensated LQR for good trajectory following
+%     'MRAC'       - Adaptive control with reference model poles in -1+-i
+%     'SMC'        - Sliding mode control with respect to angular position
 % t:
 %     'continuous'  - Simulates model and controller in continuous time
 %     'discrete'    - Simulates model and discrete in continuous time
+%
+% Functional combinations are
+% 
+%                    DC_motor   Furuta   BeamBall  Cubes
+%     'feedback'       0/0       0/0       0/0      0/0
+%     'PID'            1/1       0/0       0/0      0/0
+%     'PIDAW'          1/1       0/0       0/0      0/0
+%     'PIDcascade'     0/1       0/0       0/0      0/0
+%     'LQRi'           1/0       0/0       0/0      0/0
+%     'LQRp'           1/0       0/0       0/0      0/0
+%     'MRAC'           1/1       0/0       0/0      0/0
+%     'SMC'            1/0       0/0       0/0      0/0
 
 close all;
 clear;
 
 opt.h = 'DC_motor';
-opt.c = 'SMC';
+opt.c = 'MRAC';
 opt.t = 'continuous';
 
 %% Check that the input data is valid
-if ~strcmp('DC_motor', opt.h)
-    disp(['The hardware model "', opt.h,...
-          '" does not exist in the library.'])
-    disp('Valid choices are: DC_motor and stepper_motor.')
+models = {'DC_motor', 'Furuta', 'BeamBall', 'Cubes'};
+controllers = {'response', 'PID', 'PIDAW', 'PIDcascade', 'LQRp', 'LQRi', 'MRAC', 'SMC'};
+times = {'continuous', 'discrete'};
+
+matches = strfind(models,opt.h);
+if ~any(vertcat(matches{:})) 
+    disp(['The hardware model "', opt.h,'" does not exist in the library.'])
+    disp('Valid choices are: DC_motor.')
     return
 end
 
-if ~strcmp('response', opt.c) &&...
-   ~strcmp('PID', opt.c) &&...
-   ~strcmp('PIDAW', opt.c) &&...
-   ~strcmp('PIDcascade', opt.c) &&...
-   ~strcmp('LQRp', opt.c) && ...
-   ~strcmp('LQRi', opt.c) && ...
-   ~strcmp('MRAC', opt.c) && ...
-   ~strcmp('SMC', opt.c)
+matches = strfind(controllers,opt.c);
+if ~any(vertcat(matches{:})) 
     disp(['The controller ', opt.c, ' does not exist in the library.'])
     disp('Valid choices are: response, PID, PIDAW and cascade.')
     return
 end
 
-if ~strcmp('continuous', opt.t) &&...
-   ~strcmp('discrete', opt.t)
-    disp(['The spcified time ', opt.t, ' does not exist in the library.'])
+matches = strfind(times,opt.t);
+if ~any(vertcat(matches{:})) 
+    disp(['The specified time ', opt.t, ' does not exist in the library.'])
     disp('Valid choices are: continuous and discrete.')
     return
 end
